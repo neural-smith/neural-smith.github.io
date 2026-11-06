@@ -17,7 +17,9 @@
     - text: Web Version
       url: https://neural-smith.github.io/print-creator/app/
       primary: true
-    - text: "Download x86 & ARM for Linux"
+    - text: "Flatpak Repository"
+      url: https://neural-smith.github.io/print-creator/
+    - text: "Download for Linux as binary and AppImage"
       url: https://github.com/neural-smith/print-creator/releases
     - text: Source code
       url: https://github.com/neural-smith/print-creator
