@@ -1,19 +1,50 @@
 # Neural Smith — GitHub Pages site
 
-A small, zero-JavaScript Jekyll catalog for the Neural Smith open-source tools organization.
+A small, JavaScript-free Jekyll catalog for Neural Smith tools, published at <https://neural-smith.github.io/>.
 
-## Deploy
+## Deploy from GitHub Actions
 
-1. Create a **public** repository named `neural-smith.github.io` under the `neural-smith` organization.
-2. Copy the **contents** of this folder to the repository root, commit, and push to `main`.
-3. In **Settings → Pages**, choose **Deploy from a branch** and select `main` / `/(root)`.
-4. The site will be published at <https://neural-smith.github.io/>.
+1. Create the public organization repository **`neural-smith/neural-smith.github.io`** and commit this site's files to the `main` branch.
+2. Go to **Settings → Pages → Build and deployment → Source → GitHub Actions**. This is essential: *do not* leave **Deploy from a branch** selected, or GitHub may run its auto-generated `pages-build-deployment` workflow as well.
+3. In **Settings → Environments → github-pages**, allow deployments from `main`. If there are required reviewers, approve deployment as necessary.
+4. Push a commit to `main`, or manually run **Actions → Publish organization website → Run workflow**.
 
-This uses GitHub Pages' built-in Jekyll processing, not a custom GitHub Actions workflow. The organization homepage is distinct from the `print-creator` project's own Pages site, so it won't interfere with the signed Flatpak repository or web application hosted under `/print-creator/`.
+The workflow at `.github/workflows/pages.yml` builds Jekyll with GitHub's Pages tools, uploads `_site` as an artifact, then **creates the Pages deployment directly through the GitHub REST API**. The script at `scripts/deploy_pages.py` monitors the deployment for up to **60 minutes**, with a **75-minute GitHub Actions job limit**.
+
+The default `actions/deploy-pages@v5` action has a **hardcoded 600,000 ms (10-minute) client timeout**; passing `timeout: 3600000` to the action does not increase it. This project deliberately does not use that deployment action. The direct-API script follows the same documented OIDC authentication and Pages deployment/status endpoints, without that client-side cap.
+
+**Limitations:** a longer client-side timeout cannot bypass GitHub Pages' backend timeout, stuck deployment locks, service outages, size limits, or environment approval rules. If the deployment remains `deployment_queued` until a backend failure, inspect [GitHub Status](https://www.githubstatus.com/) and the [repository's Pages settings](https://github.com/neural-smith/neural-smith.github.io/settings/pages). A separate GitHub community report describes similar server-side queueing and a ten-minute service-side limitation. Avoid repeatedly retriggering stuck deployments, which can make a queue worse.
+
+### Permissions and security
+
+The build job has `contents: read` and `pages: read`. The deployment job has `contents: read`, `actions: read` (find artifact), `pages: write` (create deployment) and `id-token: write` (GitHub Actions OIDC). **No personal access token or additional secret is necessary**. Only deploy from protected `main`, not arbitrary pull requests or tags. `concurrency.cancel-in-progress: false` avoids interrupting an active deployment.
+
+### Troubleshooting a queued deployment
+
+Check the last deployment and its environment settings before retrying:
+
+```bash
+gh api repos/neural-smith/neural-smith.github.io/pages
+gh run list --repo neural-smith/neural-smith.github.io --limit 10
+```
+
+If the workflow created a Pages deployment with an ID or commit SHA, inspect its status:
+
+```bash
+gh api repos/neural-smith/neural-smith.github.io/pages/deployments/<DEPLOYMENT_ID>
+```
+
+If GitHub reports a deployment is stuck, investigate it before starting another one. The workflow does **not automatically cancel** an older deployment after its 60-minute local polling limit, because forced cancellation can leave a locked deployment. GitHub Pages may also experience deployment queue delays independently of this repository.
+
+### Run deployment script tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
 
 ## Add another tool
 
-Append one item to `_data/tools.yml`:
+Append an item to `_data/tools.yml`:
 
 ```yaml
 - name: Example Tool
@@ -30,32 +61,33 @@ Append one item to `_data/tools.yml`:
       url: https://github.com/neural-smith/example-tool
 ```
 
-Jekyll automatically creates an additional tool card. No HTML edits required.
+Jekyll automatically creates an additional tool card.
 
 ## Branding
 
-The **official Neural Smith GitHub organization avatar** serves as the navbar image, large header/hero image, favicon, Apple touch icon and social preview. Its URL lives in one place: `_config.yml` under `logo`. This references GitHub's image CDN directly, so it tracks changes to the organization's avatar and doesn't require an additional logo file or image processing. The trade-off is that the logo requires access to GitHub's avatar CDN. For fully self-hosted assets, save the logo under `assets/images/` and update `logo` to that local path (and adjust URL handling if needed).
-
-The site uses the Catppuccin Mocha / Latte palette with Sapphire accents, automatically following the operating system's light/dark preference. No cookies, tracking, external fonts or JavaScript are used.
+The official Neural Smith GitHub avatar is the favicon, navbar image, header image and social preview image. `_config.yml` contains its URL as the single source of truth. The site uses Catppuccin Mocha/Latte with Sapphire accents and automatic light/dark preference. It needs no JavaScript, cookies, analytics or external fonts.
 
 ## Local preview
-
-With Ruby and Bundler installed:
 
 ```bash
 bundle install
 bundle exec jekyll serve --livereload
 ```
 
-Open <http://localhost:4000/>. GitHub Pages handles Jekyll builds after pushing to the configured branch.
+Visit <http://localhost:4000/>.
 
-## Structure
+## Project structure
 
 ```text
-_config.yml             Site identity, favicon and avatar source
-_data/tools.yml         Single list of apps
-_layouts/default.html   Shared HTML shell and navigation
-index.html              Homepage built from the data list
-assets/css/style.css    Responsive CSS with automatic light/dark theme
-Gemfile                 Optional local Jekyll dependencies
+.github/workflows/pages.yml  Jekyll build + direct Pages API deployment
+scripts/deploy_pages.py      Extended Pages deployment status polling
+tests/test_deploy_pages.py   Deployment script regression tests
+_config.yml                 Site identity and avatar source
+_data/tools.yml             Application catalog
+_layouts/default.html       Shared HTML shell and navigation
+index.html                  Homepage generated from catalog
+assets/css/style.css        Responsive light/dark styles
+Gemfile                     Jekyll dependencies for local preview
 ```
+
+This organization homepage does not affect the separate Print Creator Flatpak/web Pages deployment under `/print-creator/`.

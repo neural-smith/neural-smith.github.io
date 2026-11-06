@@ -1,0 +1,63 @@
+name: Publish organization website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never start overlapping deployments to the same Pages site.
+# Do not cancel an active publish: that can leave an orphaned Pages deployment.
+concurrency:
+  group: neural-smith-organization-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Jekyll website
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site with the GitHub Pages Jekyll toolchain
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+  deploy:
+    name: Deploy via Pages REST API (extended polling)
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: https://neural-smith.github.io/
+    steps:
+      - name: Check out deployment script
+        uses: actions/checkout@v4
+
+      # actions/deploy-pages@v5 clamps timeout to 10 minutes, even if
+      # timeout: 3600000 is supplied. This script calls the documented
+      # API directly and polls up to 60 minutes instead.
+      - name: Create and monitor Pages deployment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/deploy_pages.py --timeout-seconds 3600 --poll-seconds 20
