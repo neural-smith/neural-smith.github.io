@@ -1,0 +1,66 @@
+---
+layout: default
+title: Neural Smith — Open-source tools
+---
+<main id="content">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> An open-source software forge</div>
+        <h1 id="hero-title">Useful tools.<br><span>Carefully forged.</span></h1>
+        <p class="hero-summary">Small, focused applications built to solve real problems. Explore what we're making, grab a release, or inspect the source.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#tools">Explore tools <span aria-hidden="true">↓</span></a>
+          <a class="button button-secondary" href="https://github.com/neural-smith" rel="noopener noreferrer">Visit GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Neural Smith organization logo">
+        <div class="brand-halo" aria-hidden="true"></div>
+        <img src="{{ site.logo | escape }}" alt="Neural Smith organization logo" width="260" height="260" fetchpriority="high">
+      </div>
+    </div>
+  </section>
+
+  <section class="tools-section" id="tools" aria-labelledby="tools-heading">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <p class="section-overline">From the forge</p>
+          <h2 id="tools-heading">Our tools</h2>
+          <p class="section-description">A growing collection of utilities, maintained in the open.</p>
+        </div>
+        <span class="tool-counter">{{ site.data.tools | size }} {% if site.data.tools.size == 1 %}project{% else %}projects{% endif %}</span>
+      </div>
+
+      <div class="tools-grid">
+        {% for tool in site.data.tools %}
+        <article class="tool-card">
+          <div class="card-top">
+            <span class="app-icon" aria-hidden="true">{{ tool.initials | escape }}</span>
+            <span class="category">{{ tool.category | escape }}</span>
+          </div>
+          <h3>{{ tool.name | escape }}</h3>
+          <p class="card-description">{{ tool.description | escape }}</p>
+          <div class="tags" aria-label="Supported platforms and technologies">
+            {% for platform in tool.platforms %}<span class="tag">{{ platform | escape }}</span>{% endfor %}
+            {% for technology in tool.technologies %}<span class="tag">{{ technology | escape }}</span>{% endfor %}
+          </div>
+          <div class="card-links">
+            {% for link in tool.links %}
+              <a class="card-link{% if link.primary %} card-link-primary{% endif %}" href="{{ link.url | escape }}" rel="noopener noreferrer">{{ link.text | escape }} <span aria-hidden="true">↗</span></a>
+            {% endfor %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="outro" aria-label="Project philosophy">
+    <div class="container outro-content">
+      <span class="outro-symbol" aria-hidden="true">✳</span>
+      <p>Built with curiosity. Shared with everyone.</p>
+      <a href="https://github.com/neural-smith" rel="noopener noreferrer">Explore the organization <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+</main>

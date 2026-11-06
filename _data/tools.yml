@@ -1,0 +1,21 @@
+# Add new tools here; the homepage builds the cards automatically.
+# Keep URLs absolute for links to other GitHub Pages project sites.
+- name: Print Creator
+  initials: PC
+  category: Photo & Printing
+  description: >-
+    Turn your photos into printable page layouts and PDF documents.
+    Arrange images with grids and digiKam-style templates, adjust rotation
+    and cropping, and export high-quality results.
+  platforms:
+    - Linux
+    - Browser
+  technologies:
+    - Rust
+    - Open source
+  links:
+    - text: Download
+      url: https://github.com/neural-smith/print-creator/releases
+      primary: true
+    - text: Source code
+      url: https://github.com/neural-smith/print-creator

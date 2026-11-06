@@ -1,0 +1,18 @@
+title: Neural Smith
+description: "A forge of open-source utilities. Small, practical tools, thoughtfully made."
+url: "https://neural-smith.github.io"
+baseurl: ""
+lang: en
+
+# Official neural-smith GitHub organization avatar.
+# Used for the site favicon, navigation branding, hero image and social previews.
+# Changing the organization's GitHub avatar updates this site automatically.
+logo: "https://avatars.githubusercontent.com/u/353122529?s=512&v=4"
+
+# Supported by GitHub Pages' built-in Jekyll processing.
+markdown: kramdown
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - .gitignore
