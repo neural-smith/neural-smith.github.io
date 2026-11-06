@@ -14,7 +14,7 @@
     - Rust
     - Open source
   links:
-    - text: Web Version
+    - text: Web Version - Limited
       url: https://neural-smith.github.io/print-creator/app/
       primary: true
     - text: "Flatpak Repository"
