@@ -14,8 +14,10 @@
     - Rust
     - Open source
   links:
-    - text: Download
-      url: https://github.com/neural-smith/print-creator/releases
+    - text: Web Version
+      url: https://neural-smith.github.io/print-creator/app/
       primary: true
+    - text: "Download x86 & ARM for Linux"
+      url: https://github.com/neural-smith/print-creator/releases
     - text: Source code
       url: https://github.com/neural-smith/print-creator
